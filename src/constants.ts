@@ -9,4 +9,4 @@ export const githubDetails = {
 	treeSha: "main",
 };
 
-export const GITHUB_ROOT = `https://github.com/${githubDetails.owner}/${githubDetails.repo}/blob/${githubDetails.treeSha}`;
+export const GITHUB_ROOT = `https://raw.githubusercontent.com/${githubDetails.owner}/${githubDetails.repo}/${githubDetails.treeSha}`;
