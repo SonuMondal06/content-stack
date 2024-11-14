@@ -56,7 +56,7 @@ export async function generateDocForFile(
 	per: "file" | "operation" | "tag" | undefined,
 ): Promise<void> {
 	// Get the full input path
-	const inputFile = path.join(process.cwd(), SPECS_DIR, relativePath);
+	const inputFile = path.join(SPECS_DIR, relativePath);
 
 	// Get the directory name from the relative path
 	const dirName = path.dirname(relativePath);
