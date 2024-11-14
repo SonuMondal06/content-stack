@@ -1,0 +1,14 @@
+{
+	"title": "Services",
+	"defaultOpen": true,
+	"pages": [
+		"edwrite",
+		"aibl",
+		"edspace",
+		"edflow",
+		"neuron",
+		"instruct",
+		"aisess",
+		"studysage"
+	]
+}
