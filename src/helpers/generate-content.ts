@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { APIS_DIR, GITHUB_ROOT, SPECS_DIR } from "@/constants";
 import { generateFiles } from "fumadocs-openapi";
+import { updateMdxUrls, findMdxFiles } from "./resolve-openapi-url";
 
 interface GenerateResult {
 	files: string[];
@@ -113,9 +114,13 @@ export async function generateAllDocs(
 			await generateDocForFile(file, per);
 		}
 
+		// After generating all docs, update the URLs in MDX files
+		const mdxFiles = await findMdxFiles(APIS_DIR);
+		await updateMdxUrls(mdxFiles);
+
 		return {
 			files: relativeFiles,
-			message: "Documentation generated successfully",
+			message: "Documentation generated successfully with GitHub URLs",
 		};
 	} catch (error) {
 		throw new Error(`Failed to generate documentation: ${error?.toString()}`);

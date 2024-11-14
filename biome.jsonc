@@ -18,7 +18,9 @@
 		"ignore": []
 	},
 	"javascript": {
-		"globals": ["React"]
+		"globals": [
+			"React"
+		]
 	},
 	"linter": {
 		"enabled": true,
@@ -48,7 +50,8 @@
 			},
 			"correctness": {
 				"noNodejsModules": "off",
-				"noUndeclaredDependencies": "off"
+				"noUndeclaredDependencies": "off",
+				"useImportExtensions": "off"
 			},
 			"a11y": {
 				"noSvgWithoutTitle": "off",
