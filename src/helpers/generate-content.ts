@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { APIS_DIR, SPECS_DIR } from "@/constants";
 import { generateFiles } from "fumadocs-openapi";
-import { SPECS_DIR, APIS_DIR } from "@/constants";
 
 interface GenerateResult {
 	files: string[];
