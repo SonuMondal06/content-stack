@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { APIS_DIR, SPECS_DIR } from "@/constants";
+import { APIS_DIR, GITHUB_ROOT, SPECS_DIR } from "@/constants";
 import { generateFiles } from "fumadocs-openapi";
 
 interface GenerateResult {
@@ -49,32 +49,48 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
 }
 
 /**
+ * Creates a GitHub raw URL for a spec file
+ */
+function createGithubRawUrl(relativePath: string): string {
+	// Convert github.com URL to raw.githubusercontent.com
+	// From: https://github.com/owner/repo/blob/main/path
+	// To: https://raw.githubusercontent.com/owner/repo/main/path
+	return `${GITHUB_ROOT}/${SPECS_DIR}/${relativePath}`;
+}
+
+/**
  * Generates documentation for a single file
  */
 export async function generateDocForFile(
 	relativePath: string,
 	per: "file" | "operation" | "tag" | undefined,
 ): Promise<void> {
-	// Get the full input path
-	const inputFile = path.join(SPECS_DIR, relativePath);
-
-	// Get the directory name from the relative path
-	const dirName = path.dirname(relativePath);
-
 	// Get the file name without extension to use as subdirectory
 	const fileName = path.basename(relativePath, path.extname(relativePath));
-
-	// Create the output directory path including the file name as a subdirectory
+	const dirName = path.dirname(relativePath);
 	const outputDir = path.join(APIS_DIR, dirName, fileName);
+
+	// Create GitHub raw URL for the spec file using the constants
+	const githubRawUrl = createGithubRawUrl(relativePath);
+
+	// Get the local input file for generation
+	const inputFile = path.join(SPECS_DIR, relativePath);
 
 	// Ensure the output directory exists
 	await ensureDirectoryExists(outputDir);
 
 	// Generate the documentation
 	await generateFiles({
-		input: [inputFile],
+		input: [inputFile], // Use local file for generation
 		output: outputDir,
 		per,
+		// Modify the frontmatter to include the remote URL
+		frontmatter: (title, description) => ({
+			title,
+			description,
+			full: true,
+			document: githubRawUrl, // This will be used by APIPage when deployed
+		}),
 	});
 }
 
