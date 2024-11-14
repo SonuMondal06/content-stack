@@ -19,6 +19,7 @@
 		"typescript": "^5.0.0"
 	},
 	"dependencies": {
-		"fumadocs-openapi": "^5.6.0"
+		"fumadocs-openapi": "^5.6.0",
+		"fumadocs-ui": "^14.4.0"
 	}
 }
