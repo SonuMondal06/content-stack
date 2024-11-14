@@ -4,6 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"generate": "bun run ./src/index.ts",
+		"generate:per-file": "bun run ./src/index.ts file",
+		"generate:per-operation": "bun run ./src/index.ts operation",
+		"generate:per-tag": "bun run ./src/index.ts tag",
 		"tsc": "tsc --noEmit --pretty",
 		"validate": "bun run check && bun run tsc",
 		"check": "biome check .",

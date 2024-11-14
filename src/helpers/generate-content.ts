@@ -51,7 +51,10 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
 /**
  * Generates documentation for a single file
  */
-export async function generateDocForFile(relativePath: string): Promise<void> {
+export async function generateDocForFile(
+	relativePath: string,
+	per: "file" | "operation" | "tag" | undefined,
+): Promise<void> {
 	// Get the full input path
 	const inputFile = path.join(process.cwd(), SPECS_DIR, relativePath);
 
@@ -71,13 +74,16 @@ export async function generateDocForFile(relativePath: string): Promise<void> {
 	await generateFiles({
 		input: [inputFile],
 		output: outputDir,
+		per,
 	});
 }
 
 /**
  * Main function to generate all documentation
  */
-export async function generateAllDocs(): Promise<GenerateResult> {
+export async function generateAllDocs(
+	per: "file" | "operation" | "tag" | undefined,
+): Promise<GenerateResult> {
 	try {
 		// Ensure base directories exist
 		await ensureDirectoryExists(SPECS_DIR);
@@ -88,7 +94,7 @@ export async function generateAllDocs(): Promise<GenerateResult> {
 
 		// Generate documentation for each file
 		for (const file of relativeFiles) {
-			await generateDocForFile(file);
+			await generateDocForFile(file, per);
 		}
 
 		return {

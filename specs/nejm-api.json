@@ -1,0 +1,170 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NEJM Customer APIs",
+    "description": "APIs for syncing customer data with NEJM services, and checking service health.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://beta.hooks.memorang.io",
+      "description": "Staging Environment"
+    },
+    {
+      "url": "https://hooks.memorang.com",
+      "description": "Production Environment"
+    }
+  ],
+  "paths": {
+    "/customer-sync": {
+      "post": {
+        "summary": "Sync customer data",
+        "description": "API to sync customer data between systems.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "ucid": {
+                        "type": "string",
+                        "example": "ucid_1234"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "memorang+test@memorang.com"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "properties": {
+                          "firstName": {
+                            "type": "string",
+                            "example": "Memorang"
+                          },
+                          "lastName": {
+                            "type": "string",
+                            "example": "Test"
+                          },
+                          "professionCode": {
+                            "type": "string",
+                            "example": "12"
+                          },
+                          "primarySpecialtyCode": {
+                            "type": "string",
+                            "example": "44"
+                          },
+                          "countryCode": {
+                            "type": "string",
+                            "example": "91"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["customer"]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <token>"
+            },
+            "description": "AWS HMAC authorization token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully updated customer data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error updating customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Server error example",
+                    "value": {
+                      "code": 500,
+                      "message": "Error updating customer."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/is-alive": {
+      "get": {
+        "summary": "Check service status",
+        "description": "Health check endpoint to confirm if the API service is alive.",
+        "responses": {
+          "200": {
+            "description": "Service is alive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Error updating customer."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "AWS HMAC Auth"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}

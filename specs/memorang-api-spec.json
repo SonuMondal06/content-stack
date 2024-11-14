@@ -1,0 +1,159 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Memorang Purchase API",
+    "description": "API to handle external purchase transactions for Memorang products.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://hooks.memorang.com",
+      "description": "Production server"
+    },
+    {
+      "url": "https://beta.hooks.memorang.io",
+      "description": "Beta server"
+    }
+  ],
+  "paths": {
+    "/purchase/external": {
+      "post": {
+        "summary": "Create a purchase transaction",
+        "description": "Endpoint to register an external purchase transaction.",
+        "operationId": "createPurchase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "transactionId": {
+                    "type": "string",
+                    "description": "Reference ID for the purchase, order, or test.",
+                    "example": "txn-internal-2x97"
+                  },
+                  "productId": {
+                    "type": "string",
+                    "description": "ID of the product or test purchased by the user.",
+                    "example": "c808f8e5-4202-4115-8036-a1b6e3ff194b"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "description": "ID of the purchased plan specific to the product.",
+                    "example": "9149dbfe-9cc4-44f4-8097-7c114d9e2d38"
+                  },
+                  "price": {
+                    "type": "string",
+                    "description": "Price of the product or test.",
+                    "example": "24.99"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the user.",
+                    "example": "jefree@memorang.com"
+                  },
+                  "tenantId": {
+                    "type": "string",
+                    "description": "Tenant identifier, fixed for all requests.",
+                    "example": "dcfc373c-0870-4a88-88c3-4a706de51463"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "Source of the request.",
+                    "example": "UCS-2"
+                  }
+                },
+                "required": [
+                  "transactionId",
+                  "productId",
+                  "planId",
+                  "price",
+                  "email",
+                  "tenantId",
+                  "source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful purchase transaction.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imageUrl": {
+                      "type": "string",
+                      "description": "URL of the product image.",
+                      "example": "https://icon.memorang.com/icon/icon_bundle_138_1.png"
+                    },
+                    "bundleName": {
+                      "type": "string",
+                      "description": "Name of the product bundle.",
+                      "example": "Journeyman Plumber Practice Tests"
+                    },
+                    "bundleType": {
+                      "type": "string",
+                      "description": "Type of the product bundle.",
+                      "example": "PRACTICE_TEST"
+                    },
+                    "planDuration": {
+                      "type": "string",
+                      "description": "Duration of the purchased plan.",
+                      "example": "12 months"
+                    },
+                    "userEmail": {
+                      "type": "string",
+                      "description": "Email address of the user.",
+                      "example": "jefree@memorang.com"
+                    },
+                    "accessCode": {
+                      "type": "string",
+                      "description": "Access code for the product.",
+                      "example": "PSI-138-2BB87CB9"
+                    },
+                    "ctaUrl": {
+                      "type": "string",
+                      "description": "URL for CTA, used to redeem the access code.",
+                      "example": "https://app.psiexams.com/redeem?redeemCode=PSI-138-2BB87CB9&email=jefree@memorang.com"
+                    },
+                    "isCustomAccess": {
+                      "type": "boolean",
+                      "description": "Indicates if the access is custom.",
+                      "example": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Additional product content information.",
+                      "example": "Test #A"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "hmacAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "hmacAuth": {
+        "type": "http",
+        "scheme": "hmac",
+        "description": "Use AWS HMAC authentication method."
+      }
+    }
+  }
+}
