@@ -9,6 +9,10 @@
     {
       "url": "https://api.auth.gg",
       "description": "Production server"
+    },
+    {
+      "url": "https://beta.auth.gg",
+      "description": "Beta server"
     }
   ],
   "paths": {
