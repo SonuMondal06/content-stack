@@ -1,6 +1,11 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { APIS_DIR, GITHUB_ROOT, SPECS_DIR } from "@/constants";
+import {
+	APIS_DIR,
+	GITHUB_ROOT,
+	GENERATE_CONTENT_DIR,
+	SPECS_DIR,
+} from "@/constants";
 import { generateFiles } from "fumadocs-openapi";
 import { updateMdxUrls, findMdxFiles } from "./resolve-openapi-url";
 
@@ -27,9 +32,9 @@ export async function getAllFiles(
 		if (stat.isDirectory()) {
 			await getAllFiles(path.relative(process.cwd(), filePath), arrayOfFiles);
 		} else {
-			// Store only the relative path from SPECS_DIR
+			// Store only the relative path from GENERATE_CONTENT_DIR
 			arrayOfFiles.push(
-				path.relative(path.join(process.cwd(), SPECS_DIR), filePath),
+				path.relative(path.join(process.cwd(), GENERATE_CONTENT_DIR), filePath),
 			);
 		}
 	}
@@ -56,11 +61,29 @@ function createGithubRawUrl(relativePath: string): string {
 	// Convert github.com URL to raw.githubusercontent.com
 	// From: https://github.com/owner/repo/blob/main/path
 	// To: https://raw.githubusercontent.com/owner/repo/main/path
-	return `${GITHUB_ROOT}/${SPECS_DIR}/${relativePath}`;
+	return `${GITHUB_ROOT}/${GENERATE_CONTENT_DIR}/${relativePath}`;
 }
 
 /**
- * Generates documentation for a single file
+ * Moves a file from generate-content to specs directory
+ */
+async function moveToSpecs(relativePath: string): Promise<void> {
+	const sourcePath = path.join(
+		process.cwd(),
+		GENERATE_CONTENT_DIR,
+		relativePath,
+	);
+	const targetPath = path.join(process.cwd(), SPECS_DIR, relativePath);
+
+	// Ensure the target directory exists
+	await ensureDirectoryExists(path.dirname(targetPath));
+
+	// Move the file
+	await fs.rename(sourcePath, targetPath);
+}
+
+/**
+ * Generates documentation for a single file and moves it to specs
  */
 export async function generateDocForFile(
 	relativePath: string,
@@ -75,24 +98,30 @@ export async function generateDocForFile(
 	const githubRawUrl = createGithubRawUrl(relativePath);
 
 	// Get the local input file for generation
-	const inputFile = path.join(SPECS_DIR, relativePath);
+	const inputFile = path.join(GENERATE_CONTENT_DIR, relativePath);
 
 	// Ensure the output directory exists
 	await ensureDirectoryExists(outputDir);
 
-	// Generate the documentation
-	await generateFiles({
-		input: [inputFile], // Use local file for generation
-		output: outputDir,
-		per,
-		// Modify the frontmatter to include the remote URL
-		frontmatter: (title, description) => ({
-			title,
-			description,
-			full: true,
-			document: githubRawUrl, // This will be used by APIPage when deployed
-		}),
-	});
+	try {
+		// Generate the documentation
+		await generateFiles({
+			input: [inputFile],
+			output: outputDir,
+			per,
+			frontmatter: (title, description) => ({
+				title,
+				description,
+				full: true,
+				document: githubRawUrl,
+			}),
+		});
+
+		// After successful generation, move the file to specs directory
+		await moveToSpecs(relativePath);
+	} catch (error) {
+		throw new Error(`Failed to process file ${relativePath}: ${error}`);
+	}
 }
 
 /**
@@ -102,14 +131,15 @@ export async function generateAllDocs(
 	per: "file" | "operation" | "tag" | undefined,
 ): Promise<GenerateResult> {
 	try {
-		// Ensure base directories exist
+		// Ensure all required directories exist
+		await ensureDirectoryExists(GENERATE_CONTENT_DIR);
 		await ensureDirectoryExists(SPECS_DIR);
 		await ensureDirectoryExists(APIS_DIR);
 
-		// Get all files with relative paths
-		const relativeFiles = await getAllFiles(SPECS_DIR);
+		// Get all files with relative paths from generate-content
+		const relativeFiles = await getAllFiles(GENERATE_CONTENT_DIR);
 
-		// Generate documentation for each file
+		// Generate documentation and move files for each spec
 		for (const file of relativeFiles) {
 			await generateDocForFile(file, per);
 		}
@@ -120,7 +150,8 @@ export async function generateAllDocs(
 
 		return {
 			files: relativeFiles,
-			message: "Documentation generated successfully with GitHub URLs",
+			message:
+				"Documentation generated successfully and moved to specs directory",
 		};
 	} catch (error) {
 		throw new Error(`Failed to generate documentation: ${error?.toString()}`);

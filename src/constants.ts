@@ -1,6 +1,7 @@
 // Constants for directory paths - using relative paths
 export const SPECS_DIR = "specs";
 export const APIS_DIR = "content/apis";
+export const GENERATE_CONTENT_DIR = "generate-content";
 
 export const githubDetails = {
 	owner: "SonuMondal06",
