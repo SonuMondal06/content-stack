@@ -61,7 +61,7 @@ function createGithubRawUrl(relativePath: string): string {
 	// Convert github.com URL to raw.githubusercontent.com
 	// From: https://github.com/owner/repo/blob/main/path
 	// To: https://raw.githubusercontent.com/owner/repo/main/path
-	return `${GITHUB_ROOT}/${GENERATE_CONTENT_DIR}/${relativePath}`;
+	return `${GITHUB_ROOT}/${SPECS_DIR}/${relativePath}`;
 }
 
 /**
@@ -94,7 +94,7 @@ export async function generateDocForFile(
 	const dirName = path.dirname(relativePath);
 	const outputDir = path.join(APIS_DIR, dirName, fileName);
 
-	// Create GitHub raw URL for the spec file using the constants
+	// Create GitHub raw URL for the spec file using SPECS_DIR
 	const githubRawUrl = createGithubRawUrl(relativePath);
 
 	// Get the local input file for generation
