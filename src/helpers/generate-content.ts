@@ -68,12 +68,8 @@ function createGithubRawUrl(relativePath: string): string {
  * Moves a file from generate-content to specs directory
  */
 async function moveToSpecs(relativePath: string): Promise<void> {
-	const sourcePath = path.join(
-		process.cwd(),
-		GENERATE_CONTENT_DIR,
-		relativePath,
-	);
-	const targetPath = path.join(process.cwd(), SPECS_DIR, relativePath);
+	const sourcePath = path.join(GENERATE_CONTENT_DIR, relativePath);
+	const targetPath = path.join(SPECS_DIR, relativePath);
 
 	// Ensure the target directory exists
 	await ensureDirectoryExists(path.dirname(targetPath));
@@ -94,16 +90,19 @@ export async function generateDocForFile(
 	const dirName = path.dirname(relativePath);
 	const outputDir = path.join(APIS_DIR, dirName, fileName);
 
-	// Create GitHub raw URL for the spec file using SPECS_DIR
+	// Create GitHub raw URL for the spec file using the constants
 	const githubRawUrl = createGithubRawUrl(relativePath);
 
 	// Get the local input file for generation
-	const inputFile = path.join(GENERATE_CONTENT_DIR, relativePath);
+	const inputFile = path.join(SPECS_DIR, relativePath);
 
 	// Ensure the output directory exists
 	await ensureDirectoryExists(outputDir);
 
 	try {
+		// Move the file to specs directory
+		await moveToSpecs(relativePath);
+
 		// Generate the documentation
 		await generateFiles({
 			input: [inputFile],
@@ -116,9 +115,6 @@ export async function generateDocForFile(
 				document: githubRawUrl,
 			}),
 		});
-
-		// After successful generation, move the file to specs directory
-		await moveToSpecs(relativePath);
 	} catch (error) {
 		throw new Error(`Failed to process file ${relativePath}: ${error}`);
 	}
