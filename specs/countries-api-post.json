@@ -7,16 +7,16 @@
   },
   "servers": [
     {
-      "url": "https://restcountries.com/v3.1",
+      "url": "https://restcountries.com",
       "description": "Production server"
     },
     {
-      "url": "https://beta.restcountries.com/v3.1",
+      "url": "https://beta.restcountries.com",
       "description": "Beta server"
     }
   ],
   "paths": {
-    "/name/{name}": {
+    "/v3.1/name/{name}": {
       "post": {
         "summary": "Create country by name",
         "description": "Creates a new country entry with the given name",
@@ -193,7 +193,22 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for authentication"
       }
     }
   }
