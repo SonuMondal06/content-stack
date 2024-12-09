@@ -9,6 +9,10 @@
     {
       "url": "https://restcountries.com/v3.1",
       "description": "Production server"
+    },
+    {
+      "url": "https://beta.restcountries.com/v3.1",
+      "description": "Beta server"
     }
   ],
   "paths": {
